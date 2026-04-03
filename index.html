@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+  <title>ContactHub Intelligence | AI Contact Management</title>
+  <meta name="description" content="AI-powered contact management platform with social media integration and Gemini AI assistant."/>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Orbitron:wght@400;600;700&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="css/style.css"/>
+</head>
+<body>
+
+<!-- ===== AUTH SCREEN ===== -->
+<div id="auth-screen" class="screen active">
+  <div class="auth-bg">
+    <div id="particles"></div>
+    <div class="auth-container">
+      <div class="auth-brand">
+        <div class="brand-logo">⬡</div>
+        <h1>ContactHub<span>Intelligence</span></h1>
+        <p>AI-Powered Contact Management Platform</p>
+      </div>
+
+      <div class="auth-card" id="login-card">
+        <h2>Welcome Back</h2>
+        <p class="auth-subtitle">Sign in to your workspace</p>
+        <div class="form-group">
+          <label>Email Address</label>
+          <div class="input-wrap"><span>✉</span><input type="email" id="login-email" placeholder="Enter your email"/></div>
+        </div>
+        <div class="form-group">
+          <label>Password</label>
+          <div class="input-wrap"><span>🔒</span><input type="password" id="login-pass" placeholder="Enter your password"/></div>
+        </div>
+        <div class="auth-error hidden" id="login-error"></div>
+        <button class="btn-primary full" onclick="handleLogin()">Sign In</button>
+        <p class="auth-switch">No account? <a href="#" onclick="switchAuth('register')">Register</a></p>
+      </div>
+
+      <div class="auth-card hidden" id="register-card">
+        <h2>Create Account</h2>
+        <p class="auth-subtitle">Join ContactHub Intelligence</p>
+        <div class="form-group">
+          <label>Full Name</label>
+          <div class="input-wrap"><span>👤</span><input type="text" id="reg-name" placeholder="Your full name"/></div>
+        </div>
+        <div class="form-group">
+          <label>Email</label>
+          <div class="input-wrap"><span>✉</span><input type="email" id="reg-email" placeholder="Email address"/></div>
+        </div>
+        <div class="form-group">
+          <label>Password</label>
+          <div class="input-wrap"><span>🔒</span><input type="password" id="reg-pass" placeholder="Min 6 characters"/></div>
+        </div>
+        <div class="auth-error hidden" id="reg-error"></div>
+        <button class="btn-primary full" onclick="handleRegister()">Create Account</button>
+        <p class="auth-switch">Have account? <a href="#" onclick="switchAuth('login')">Sign In</a></p>
+      </div>
+      <p class="demo-hint">💡 Tip: Register with any email & password (6+ chars), then sign in</p>
+    </div>
+  </div>
+</div>
+
+<!-- ===== APP SCREEN ===== -->
+<div id="app-screen" class="screen hidden">
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-top">
+      <div class="s-brand">
+        <span class="s-logo">⬡</span>
+        <span class="s-name">ContactHub</span>
+      </div>
+      <button class="s-toggle" onclick="toggleSidebar()">☰</button>
+    </div>
+    <nav class="s-nav">
+      <button class="s-nav-item active" id="nav-dashboard" onclick="navigateTo('dashboard')"><span>🏠</span><span class="s-label">Dashboard</span></button>
+      <button class="s-nav-item" id="nav-contacts" onclick="navigateTo('contacts')"><span>👥</span><span class="s-label">Contacts</span></button>
+      <button class="s-nav-item" id="nav-ai" onclick="navigateTo('ai')"><span>🤖</span><span class="s-label">AI Assistant</span></button>
+      <button class="s-nav-item" id="nav-chat" onclick="navigateTo('chat')"><span>💬</span><span class="s-label">Messages</span><span class="badge hidden" id="chat-badge">0</span></button>
+      <button class="s-nav-item" id="nav-reminders" onclick="navigateTo('reminders')"><span>⏰</span><span class="s-label">Reminders</span></button>
+    </nav>
+    <div class="s-footer">
+      <div class="s-user"><div class="s-avatar" id="sidebar-avatar">U</div><div><div class="s-uname" id="sidebar-uname">User</div><div class="s-role">Pro</div></div></div>
+      <button class="s-logout" onclick="handleLogout()">🚪</button>
+    </div>
+  </aside>
+
+  <main class="main-content">
+    <header class="topbar">
+      <div class="tb-left">
+        <button class="mob-menu" onclick="toggleSidebar()">☰</button>
+        <div><h1 class="page-title" id="page-title">Dashboard</h1><p class="page-sub" id="page-sub">Welcome back!</p></div>
+      </div>
+      <div class="tb-right">
+        <div class="top-search"><span>🔍</span><input type="text" id="global-search" placeholder="Search contacts..." oninput="globalSearch(this.value)"/></div>
+        <button class="notif-btn" onclick="navigateTo('reminders')">🔔<span class="notif-dot hidden" id="notif-dot"></span></button>
+        <div class="tb-avatar" id="tb-avatar">U</div>
+      </div>
+    </header>
+
+    <div class="pages">
+
+      <!-- DASHBOARD -->
+      <div class="page active" id="page-dashboard">
+        <div class="stats-row">
+          <div class="stat-card"><div class="stat-ico">👥</div><div><div class="stat-val" id="stat-contacts">0</div><div class="stat-lbl">Contacts</div></div></div>
+          <div class="stat-card"><div class="stat-ico">💬</div><div><div class="stat-val" id="stat-messages">0</div><div class="stat-lbl">Messages</div></div></div>
+          <div class="stat-card"><div class="stat-ico">⏰</div><div><div class="stat-val" id="stat-reminders">0</div><div class="stat-lbl">Reminders</div></div></div>
+          <div class="stat-card"><div class="stat-ico">🤖</div><div><div class="stat-val" id="stat-ai">0</div><div class="stat-lbl">AI Queries</div></div></div>
+        </div>
+        <div class="dash-grid">
+          <div class="dash-card">
+            <div class="dc-head"><h3>Recent Contacts</h3><button class="btn-sm" onclick="navigateTo('contacts')">View All</button></div>
+            <div id="recent-contacts-list"><p class="empty-mini">No contacts yet.</p></div>
+          </div>
+          <div class="dash-card">
+            <div class="dc-head"><h3>Activity Feed</h3></div>
+            <div id="activity-feed"><p class="empty-mini">No recent activity.</p></div>
+          </div>
+          <div class="dash-card">
+            <div class="dc-head"><h3>Categories</h3></div>
+            <canvas id="category-chart" width="280" height="160"></canvas>
+            <div id="chart-legend" class="chart-legend"></div>
+          </div>
+          <div class="dash-card">
+            <div class="dc-head"><h3>Quick Actions</h3></div>
+            <div class="quick-grid">
+              <button class="quick-btn" onclick="openAddContact()"><span>➕</span>Add Contact</button>
+              <button class="quick-btn" onclick="navigateTo('ai')"><span>🤖</span>Ask AI</button>
+              <button class="quick-btn" onclick="navigateTo('chat')"><span>💬</span>New Chat</button>
+              <button class="quick-btn" onclick="openAddReminder()"><span>⏰</span>Reminder</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- CONTACTS -->
+      <div class="page" id="page-contacts">
+        <div class="contacts-bar">
+          <div class="cb-left">
+            <div class="search-box"><span>🔍</span><input type="text" id="contact-search" placeholder="Search..." oninput="filterContacts(this.value)"/></div>
+            <select id="cat-filter" class="filter-sel" onchange="filterContacts(document.getElementById('contact-search').value)">
+              <option value="">All</option><option>Personal</option><option>Work</option><option>Family</option><option>Friend</option><option>Business</option><option>Other</option>
+            </select>
+          </div>
+          <div class="cb-right">
+            <button class="vt active" id="view-grid" onclick="setView('grid')">⊞ Grid</button>
+            <button class="vt" id="view-list" onclick="setView('list')">≡ List</button>
+            <button class="btn-primary" onclick="openAddContact()">➕ Add Contact</button>
+          </div>
+        </div>
+        <div id="contacts-container" class="contacts-grid"></div>
+      </div>
+
+      <!-- AI ASSISTANT -->
+      <div class="page" id="page-ai">
+        <div class="ai-layout">
+          <div class="ai-side">
+            <div class="ai-head-panel">
+              <div class="ai-bot-icon">🤖<div class="ai-pulse"></div></div>
+              <h3>Nexus AI</h3>
+              <p>Intelligent Contact Assistant</p>
+            </div>
+            <div class="ai-caps">
+              <b>I can help you:</b>
+              <ul>
+                <li>➕ Add &amp; edit contacts</li>
+                <li>🔍 Search contacts</li>
+                <li>🔄 Detect duplicates</li>
+                <li>📊 Group by company</li>
+                <li>⏰ Set reminders</li>
+                <li>💌 Write messages</li>
+                <li>📈 Show insights</li>
+              </ul>
+            </div>
+            <div class="api-config">
+              <label>🔑 Gemini API Key</label>
+              <input type="password" id="gemini-api-key" placeholder="Paste Gemini API key..."/>
+              <button class="btn-sm-p" onclick="saveApiKey()">Save Key</button>
+              <span id="api-status" class="api-status"></span>
+            </div>
+          </div>
+          <div class="ai-chat-wrap">
+            <div class="ai-msgs" id="ai-messages">
+              <div class="ai-msg bot">
+                <div class="ai-av">🤖</div>
+                <div class="ai-bubble">
+                  <p>Hello! I'm <b>Nexus AI</b> — your intelligent contact assistant powered by Google Gemini.</p>
+                  <p>Try: <i>"Add John Doe, phone 555-1234, email john@work.com"</i><br/>Or: <i>"Show all Work contacts"</i><br/>Or: <i>"Find duplicates"</i></p>
+                  <span class="msg-time">Now</span>
+                </div>
+              </div>
+            </div>
+            <div class="ai-input-area">
+              <div class="quick-prompts">
+                <button onclick="sendAIMsg('Show all contacts')">📋 All contacts</button>
+                <button onclick="sendAIMsg('Find duplicate contacts')">🔄 Duplicates</button>
+                <button onclick="sendAIMsg('Group contacts by company')">📊 By company</button>
+                <button onclick="sendAIMsg('Show top 5 contacts')">⭐ Top contacts</button>
+              </div>
+              <div class="ai-input-row">
+                <textarea id="ai-input" placeholder="Ask Nexus AI anything..." rows="1" onkeydown="handleAIKey(event)" oninput="autoResize(this)"></textarea>
+                <button class="ai-send" id="ai-send-btn" onclick="sendAIMsg()">🚀</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- CHAT -->
+      <div class="page" id="page-chat">
+        <div class="chat-layout">
+          <div class="chat-side">
+            <div class="cs-head"><h3>Messages</h3><button class="btn-sm" onclick="openNewChat()">✏️ New</button></div>
+            <input type="text" class="chat-search-input" placeholder="Search chats..." oninput="searchChats(this.value)"/>
+            <div id="chat-list"><p class="empty-mini">No conversations. Pick a contact to chat!</p></div>
+          </div>
+          <div class="chat-main-area" id="chat-main">
+            <div class="chat-empty"><div class="ce-icon">💬</div><h3>Select a conversation</h3><p>Pick a contact to start messaging</p><button class="btn-primary" onclick="openNewChat()">New Chat</button></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- REMINDERS -->
+      <div class="page" id="page-reminders">
+        <div class="rem-header"><h2>Reminders &amp; Follow-ups</h2><button class="btn-primary" onclick="openAddReminder()">➕ New Reminder</button></div>
+        <div id="reminders-grid" class="rem-grid"></div>
+      </div>
+
+    </div>
+  </main>
+</div>
+
+<!-- ===== MODALS ===== -->
+
+<!-- Add/Edit Contact -->
+<div class="overlay hidden" id="contact-modal-overlay" onclick="overlayClose(event,'contact-modal-overlay')">
+  <div class="modal" id="contact-modal">
+    <div class="modal-head"><h2 id="c-modal-title">Add Contact</h2><button onclick="closeModal('contact-modal-overlay')">✕</button></div>
+    <div class="modal-body">
+      <div class="modal-tabs">
+        <button class="mtab active" onclick="switchTab('basic',this)">👤 Basic</button>
+        <button class="mtab" onclick="switchTab('pro',this)">💼 Work</button>
+        <button class="mtab" onclick="switchTab('social',this)">🌐 Social</button>
+        <button class="mtab" onclick="switchTab('notes',this)">📝 Notes</button>
+      </div>
+      <input type="hidden" id="contact-id"/>
+      <div class="tab-pane active" id="tab-basic">
+        <div class="form-row"><div class="form-group"><label>First Name *</label><input type="text" id="c-firstname" placeholder="First name"/></div><div class="form-group"><label>Last Name</label><input type="text" id="c-lastname" placeholder="Last name"/></div></div>
+        <div class="form-group"><label>Email</label><input type="email" id="c-email" placeholder="email@example.com"/></div>
+        <div class="form-group"><label>Phone</label><input type="tel" id="c-phone" placeholder="+1 555-000-0000"/></div>
+        <div class="form-group"><label>Category</label><select id="c-category"><option>Personal</option><option>Work</option><option>Family</option><option>Friend</option><option>Business</option><option>Other</option></select></div>
+        <div class="form-group"><label>Address</label><input type="text" id="c-address" placeholder="City, Country"/></div>
+        <div class="form-group"><label>Avatar Color</label><div class="color-row" id="color-picker"><div class="col-opt sel" data-c="#7c3aed" style="background:#7c3aed" onclick="pickColor('#7c3aed',this)"></div><div class="col-opt" data-c="#06b6d4" style="background:#06b6d4" onclick="pickColor('#06b6d4',this)"></div><div class="col-opt" data-c="#10b981" style="background:#10b981" onclick="pickColor('#10b981',this)"></div><div class="col-opt" data-c="#f59e0b" style="background:#f59e0b" onclick="pickColor('#f59e0b',this)"></div><div class="col-opt" data-c="#ef4444" style="background:#ef4444" onclick="pickColor('#ef4444',this)"></div><div class="col-opt" data-c="#ec4899" style="background:#ec4899" onclick="pickColor('#ec4899',this)"></div></div></div>
+      </div>
+      <div class="tab-pane hidden" id="tab-pro">
+        <div class="form-group"><label>Company</label><input type="text" id="c-company" placeholder="Company name"/></div>
+        <div class="form-group"><label>Job Title</label><input type="text" id="c-jobtitle" placeholder="Role / Position"/></div>
+        <div class="form-group"><label>Website</label><input type="url" id="c-website" placeholder="https://example.com"/></div>
+      </div>
+      <div class="tab-pane hidden" id="tab-social">
+        <div class="form-group"><label>🌐 Facebook</label><input type="text" id="c-facebook" placeholder="Profile URL or username"/></div>
+        <div class="form-group"><label>📸 Instagram</label><input type="text" id="c-instagram" placeholder="@username or URL"/></div>
+        <div class="form-group"><label>💼 LinkedIn</label><input type="text" id="c-linkedin" placeholder="linkedin.com/in/..."/></div>
+        <div class="form-group"><label>🐦 Twitter / X</label><input type="text" id="c-twitter" placeholder="@username or URL"/></div>
+      </div>
+      <div class="tab-pane hidden" id="tab-notes">
+        <div class="form-group"><label>Notes</label><textarea id="c-notes" rows="5" placeholder="How you met, important details..."></textarea></div>
+        <div class="form-group"><label>Tags (comma separated)</label><input type="text" id="c-tags" placeholder="vip, client, mentor..."/></div>
+      </div>
+    </div>
+    <div class="modal-foot"><button class="btn-secondary" onclick="closeModal('contact-modal-overlay')">Cancel</button><button class="btn-primary" onclick="saveContact()">💾 Save Contact</button></div>
+  </div>
+</div>
+
+<!-- Contact Detail -->
+<div class="overlay hidden" id="detail-overlay" onclick="overlayClose(event,'detail-overlay')">
+  <div class="modal modal-lg" id="detail-modal">
+    <div class="modal-head"><div id="detail-header"></div><div style="display:flex;gap:8px"><button class="btn-sm" id="detail-edit-btn">✏️ Edit</button><button onclick="closeModal('detail-overlay')">✕</button></div></div>
+    <div class="modal-body" id="detail-body"></div>
+  </div>
+</div>
+
+<!-- Reminder Modal -->
+<div class="overlay hidden" id="reminder-overlay" onclick="overlayClose(event,'reminder-overlay')">
+  <div class="modal" id="reminder-modal">
+    <div class="modal-head"><h2>Set Reminder</h2><button onclick="closeModal('reminder-overlay')">✕</button></div>
+    <div class="modal-body">
+      <div class="form-group"><label>Contact (optional)</label><select id="r-contact"><option value="">-- General reminder --</option></select></div>
+      <div class="form-group"><label>Title *</label><input type="text" id="r-title" placeholder="e.g. Follow up with John"/></div>
+      <div class="form-group"><label>Notes</label><textarea id="r-desc" rows="3" placeholder="Additional info..."></textarea></div>
+      <div class="form-row"><div class="form-group"><label>Date</label><input type="date" id="r-date"/></div><div class="form-group"><label>Time</label><input type="time" id="r-time"/></div></div>
+    </div>
+    <div class="modal-foot"><button class="btn-secondary" onclick="closeModal('reminder-overlay')">Cancel</button><button class="btn-primary" onclick="saveReminder()">⏰ Save</button></div>
+  </div>
+</div>
+
+<!-- New Chat Modal -->
+<div class="overlay hidden" id="newchat-overlay" onclick="overlayClose(event,'newchat-overlay')">
+  <div class="modal" id="newchat-modal">
+    <div class="modal-head"><h2>New Message</h2><button onclick="closeModal('newchat-overlay')">✕</button></div>
+    <div class="modal-body">
+      <div class="form-group"><label>Pick a Contact</label><input type="text" id="nc-search" placeholder="Search..." oninput="ncSearch(this.value)"/></div>
+      <div id="nc-list" class="nc-list"></div>
+    </div>
+  </div>
+</div>
+
+<!-- Toast -->
+<div id="toasts"></div>
+
+<script src="js/db.js"></script>
+<script src="js/auth.js"></script>
+<script src="js/contacts.js"></script>
+<script src="js/chat.js"></script>
+<script src="js/reminders.js"></script>
+<script src="js/ai.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>
